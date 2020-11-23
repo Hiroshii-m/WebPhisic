@@ -8,7 +8,7 @@ ini_set('error_log', 'error.log');
 // =====================================
 // デバッグ
 // =====================================
-$debug_flg = true;
+$debug_flg = false;
 function debug($str){
     global $debug_flg;
     if(!empty($debug_flg)){
@@ -20,7 +20,7 @@ function debug($str){
 // セッション準備・セッション有効期限を延ばす
 // =====================================
 // デフォルトだと、24分でセッションが削除されてしまうので、置き場所変更
-session_save_path("/var/tmp/");
+// session_save_path("/var/tmp/");
 // ガーベージコレクションが削除するセッションの有効期限を設定（30日に設定）
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 30);
 // ブラウザを閉じても削除されないようにクッキー自体の有効期限を延ばす
