@@ -47,7 +47,7 @@ if(!empty($_POST)){
             $_SESSION['user_id'] = $dbh->lastInsertId();
 
             // マイページへ遷移
-            header("Location:mypage.html");
+            header("Location:mypage.php");
             exit;
         }
     }
