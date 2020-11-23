@@ -1,0 +1,209 @@
+/* =================================== */
+/* スタイル初期化 */
+/* =================================== */
+body{
+    margin: 0;
+    background: #F7FAF7;
+}
+li{
+    list-style: none;
+}
+a{
+    text-decoration: none;
+    color: #000000;
+}
+input{
+    width: 100%;
+}
+input:focus{
+    outline: none;
+}
+img{
+    width: 100%;
+    height: 100%;
+}
+
+/* =================================== */
+/* カスタムプロパティ */
+/* =================================== */
+:root{
+    --header-height: 80px;
+}
+/* =================================== */
+/* ヘッダー */
+/* =================================== */
+.header{
+    background: #539B46;
+    height: var(--header-height);
+    line-height: var(--header-height);
+}
+.header_inner{
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin: 0 auto;
+}
+.header_item, .header_top{
+    color: #fff;
+}
+.header_top{
+    font-size: 28px;
+}
+.header_item{
+    font-size: 20px;
+    margin: 0 0 0 10px;
+}
+/* =================================== */
+/* コンテンツ */
+/* =================================== */
+.ct{
+    width: 850px;
+    margin: 80px 0 80px 100px;
+}
+.ct_list{
+    border: 5px solid #539B46;
+    padding: 50px;
+    border-radius: 10px;
+}
+.ct_wrap{
+    height: 500px;
+    overflow: scroll;
+}
+.ct_item{
+    border: 1px solid #539B46;
+    padding: 30px;
+    position: relative;
+}
+.ct_change{
+    position: absolute;
+    color: #fff;
+    background: #539B46;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    right: 50px;
+    border-radius: 10px;
+}
+
+/* =================================== */
+/* サイドバー */
+/* =================================== */
+.sidebar{
+    position: absolute;
+    top: 200px;
+    right: 100px;
+    width: 250px;
+    height: 400px;
+    background: #A3CADD;
+    padding: 50px;
+    box-sizing: border-box;
+}
+.sidebar_item{
+    border-bottom: 1px solid #444;
+    margin-bottom: 10px;
+    width: 140px;
+}
+/* =================================== */
+/* フォーム */
+/* =================================== */
+.form{
+    margin: 50px 0;
+}
+.form_tit{
+    text-align: center;
+}
+.form_list{
+    width: 400px;
+    margin: 0 auto;
+    padding: 70px 70px 100px 70px;
+    background: #fff;
+    position: relative;
+    font-size: 20px;
+}
+.form_item{
+    display: block;
+    margin-bottom: 30px;
+}
+.form_input{
+    display: block;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    font-size: 20px;
+    margin-top: 10px;
+}
+.err {
+    color: #ff0000;
+}
+.err > .form_input{
+    background: #FFCCCC;
+    border-bottom: 1px solid #ff0000;
+}
+.form_submit{
+    width: 100px;
+    height: 40px;
+    position: absolute;
+    right: 70px;
+    bottom: 50px;
+    background: #539B46;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+.form_retire{
+    width: 200px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    color: #fff;
+    background: #539B46;
+    border: none;
+    display: block;
+    margin: 50px auto 0 auto;
+    font-size: 20px;
+    cursor: pointer;
+}
+/* =================================== */
+/* 画像関係 */
+/* =================================== */
+.area-drop{
+    width: 100%;
+    height: 250px;
+    line-height: 250px;
+    background: #dadada;
+    text-align: center;
+    position: relative;
+}
+.img-input{
+    height: 100%;
+    position: absolute;
+    margin: 0;
+}
+/* =================================== */
+/* フッター */
+/* =================================== */
+.footer{
+    width: 100%;
+    height: 50px;
+    background: #539B46;
+    text-align: center;
+    line-height: 50px;
+    color: #fff;
+}
+/* =================================== */
+/* component */
+/* =================================== */
+.c-flex{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+/* =================================== */
+/* エラー */
+/* =================================== */
+.area-msg{
+    color: #ff0000;
+}
