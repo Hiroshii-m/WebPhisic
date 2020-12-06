@@ -20,11 +20,12 @@ function debug($str){
 // セッション準備・セッション有効期限を延ばす
 // =====================================
 // デフォルトだと、24分でセッションが削除されてしまうので、置き場所変更
-// session_save_path("/var/tmp/");
-// // ガーベージコレクションが削除するセッションの有効期限を設定（30日に設定）
+session_save_path("/var/tmp/");
+// ガーベージコレクションが削除するセッションの有効期限を設定（30日に設定）
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 30);
-// // ブラウザを閉じても削除されないようにクッキー自体の有効期限を延ばす
+// ブラウザを閉じても削除されないようにクッキー自体の有効期限を延ばす
 ini_set('session.cookie_lifetime', 60 * 60 * 24 * 30);
+// 上の設定は、session_start()の前に書かないといけない。キャッシュなどのヘッダー情報が送信される。
 session_start();
 // セッションIDを再発行
 session_regenerate_id();
@@ -39,6 +40,8 @@ define('MSG_MIN', '6文字以上入力してください。');
 define('MSG_MAX', '最大文字数を超えています。');
 define('MSG_HALFENG', '半角英数字で入力してください。');
 define('MSG_NOMATCH', 'パスワードとパスワード（再入力）が合っていません。');
+define('MSG_NEWMATCH', '新しいパスワードに変更してください。');
+define('MSG_PASSMATCH', 'パスワードが合っていません。');
 define('MSG_WAIT', 'エラーが発生しました。しばらく経ってから、やり直してください。');
 define('MSG_NOLOGIN', 'Emailもしくは、パスワードが一致しません。');
 define('MSG_NODATA', '本日の体調管理データは登録済です。変更したい場合、マイページから編集ボタンを押してください。');
@@ -81,6 +84,7 @@ function validEmailDup($str, $key){
 }
 // Emailのバリデーションをまとめる
 function validationEmail($email, $key){
+    global $err_msg;
     validRequired($email, 'email');
     if(empty($err_msg['email'])){
         // 最大文字数かどうか
@@ -89,6 +93,27 @@ function validationEmail($email, $key){
     if(empty($err_msg['email'])){
         // メール形式かどうか
         validEmail($email, 'email');
+    }
+}
+// パスワードのバリデーションをまとめる
+function validationPass($pass, $key){
+    global $err_msg;
+    if(empty($err_msg[$key])){
+        // 最小文字数チェック
+        validMin($pass, $key);
+    }
+    if(empty($err_msg[$key])){
+        // 半角英数字チェック
+        validHalf($pass, $key);
+    }
+}
+// パスワードバーリファイ
+function validPassVerify($pass, $pass_hash, $key, $pass_flg = false){
+    global $err_msg;
+    if(!password_verify($pass, $pass_hash) && $pass_flg === false){
+        $err_msg[$key] = MSG_PASSMATCH;
+    }else if(password_verify($pass, $pass_hash) && $pass_flg === true){
+        $err_msg[$key] = MSG_NEWMATCH;
     }
 }
 // 最小文字数以上かどうか判定
@@ -188,9 +213,9 @@ function validErr($key){
 // =====================================
 function dbConnect(){
     // DB接続準備
-    $dsn = 'mysql:dbname=hiroshishi_management;host=mysql1.php.xdomain.ne.jp;charset=utf8';
-    $user = 'hiroshishi_xzjo';
-    $password = 'itadoriyuki';
+    $dsn = 'mysql:dbname=management;host=localhost;charset=utf8';
+    $user = 'root';
+    $password = 'root';
     $options = array(
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -233,6 +258,24 @@ function getUserInfo($u_id){
         $err_msg['common'] = MSG_WAIT;
     }
 }
+// パスワードを取得
+function getPass($u_id){
+    try {
+        $dbh = dbConnect();
+        $sql = 'SELECT `password` FROM users WHERE id = :u_id';
+        $data = array(':u_id' => $u_id);
+        $stmt = queryPost($dbh, $sql, $data);
+
+        if($stmt){
+            $rst = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $rst['password'];
+        }
+
+    } catch ( Exception $e ){
+        error_log('エラー発生' . print_r($e->getMessage()));
+        $err_msg['common'] = MSG_WAIT;
+    }
+}
 // 体調データを取得する
 function getPhysicOne($h_id, $u_id){
     try{
@@ -252,12 +295,14 @@ function getPhysicOne($h_id, $u_id){
     }
 }
 // 体調データの塊を取得する
-function getPhysicData($u_id){
+function getPhysicData($u_id, $listSpan){
     try{
         $dbh = dbConnect();
-        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` ASC LIMIT 21 OFFSET 0';
-        $data = array(':u_id' => $u_id);
-        $stmt = queryPost($dbh, $sql, $data);
+        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` ASC LIMIT :listSpan OFFSET 0';
+        $stmt = $dbh->prepare($sql);
+        $stmt->bindValue(':u_id', $u_id, PDO::PARAM_INT);
+        $stmt->bindValue(':listSpan', $listSpan, PDO::PARAM_INT);
+        $stmt->execute();
 
         if($stmt){
             $rst = $stmt->fetchAll();
@@ -265,7 +310,30 @@ function getPhysicData($u_id){
         }
 
     } catch ( Exception $e ){
-        error_log('エラー発生；' . print_r($e->getMessage()));
+        error_log('エラー発生；' . print_r($e->getMessage()), true);
+        $err_msg['common'] = MSG_WAIT;
+    }
+}
+// 体調データリストを取得する
+function getPhysicDataList($u_id, $currentNum){
+    try{
+        $listSpan = 7 * $currentNum;
+        $minSpan = 7 * ($currentNum - 1);
+        $dbh = dbConnect();
+        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` ASC LIMIT :listSpan OFFSET :minSpan';
+        $stmt = $dbh->prepare($sql);
+        $stmt->bindValue(':u_id', $u_id, PDO::PARAM_INT);
+        $stmt->bindValue(':listSpan', $listSpan, PDO::PARAM_INT);
+        $stmt->bindValue(':minSpan', $minSpan, PDO::PARAM_INT);
+        $rst = $stmt->execute();
+
+        if($stmt){
+            $rst = $stmt->fetchAll();
+            return $rst;
+        }
+
+    }catch ( Exception $e ){
+        error_log('エラー発生：' . print_r($e->getMessage()), true);
         $err_msg['common'] = MSG_WAIT;
     }
 }

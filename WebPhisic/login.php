@@ -16,14 +16,7 @@ if(!empty($_POST)){
     // バリデーションチェック
     validationEmail($email, 'email');
     validRequired($pass, 'pass');
-    if(empty($err_msg['pass'])){
-        // 最小文字数チェック
-        validMin($pass, 'pass');
-    }
-    if(empty($err_msg['pass'])){
-        // 半角英数字チェック
-        validHalf($pass, 'pass');
-    }
+    validationPass($pass, 'pass');
 
     if(empty($err_msg)){
         debug('バリデーションOKです。');

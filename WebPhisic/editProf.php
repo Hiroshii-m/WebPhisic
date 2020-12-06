@@ -121,6 +121,11 @@ require('head.php');
         </form>
     </section>
 
+    <!-- サイドバー -->
+    <?php
+    require('sidebar.php');
+    ?>
+
     <!-- フッター -->
     <?php
     require('footer.php');

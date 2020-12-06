@@ -11,7 +11,7 @@ require('auth.php');
 
 $u_id = $_SESSION['user_id'];
 $UserInfo = getUserInfo($u_id);
-$height = $UserInfo['height']/100;
+$height = (!empty($UserInfo['height'])) ? $UserInfo['height']/100 : 0;
 validDate(date('Y-m-d'), $u_id);
 
 if(!empty($_POST)){
@@ -22,7 +22,7 @@ if(!empty($_POST)){
     $weight = (!empty($_POST['weight'])) ? $_POST['weight'] : 0;
     $bpercent = (!empty($_POST['bpercent'])) ? $_POST['bpercent'] : 0;
     // bmiデータ
-    $bmi = (!empty($height) && !empty($weight)) ? round($weight/($height**2), 1): '';
+    $bmi = (!empty($height) && !empty($weight)) ? round($weight/($height**2), 1): 0;
     $getime = (!empty($_POST['getime'])) ? $_POST['getime'] : '';
     $sleeptime = (!empty($_POST['sleeptime'])) ? $_POST['sleeptime'] : '';
     $feel = (!empty($_POST['feel'])) ? $_POST['feel'] : 3;
@@ -144,6 +144,11 @@ require('head.php');
             <input class="form_submit" type="submit" value="送信">
         </form>
     </section>
+
+    <!-- サイドバー -->
+    <?php
+    require('sidebar.php');
+    ?>
 
     <!-- フッター -->
     <?php

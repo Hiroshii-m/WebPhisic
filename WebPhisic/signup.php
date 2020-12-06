@@ -18,15 +18,11 @@ if(!empty($_POST)){
         // Email重複チェック
         validEmailDup($email, 'email');
     }
+    // パスワードのバリデーション
     validRequired($pass, 'pass');
-    if(empty($err_msg['pass'])){
-        // 最小文字数チェック
-        validMin($pass, 'pass');
-    }
-    if(empty($err_msg['pass'])){
-        // 半角英数字チェック
-        validHalf($pass, 'pass');
-    }
+    validationPass($pass, 'pass');
+    validationPass($pass_re, 'pass_re');
+    // パスワードと再入力がマッチしているかどうか
     validRequired($pass_re, 'pass_re');
     if(empty($err_msg['pass']) && empty($err_msg['pass_re'])){
         validMatch($pass, $pass_re, 'pass');
