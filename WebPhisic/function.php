@@ -20,7 +20,7 @@ function debug($str){
 // セッション準備・セッション有効期限を延ばす
 // =====================================
 // デフォルトだと、24分でセッションが削除されてしまうので、置き場所変更
-// session_save_path("/var/tmp/");
+session_save_path("/var/tmp/");
 // ガーベージコレクションが削除するセッションの有効期限を設定（30日に設定）
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 30);
 // ブラウザを閉じても削除されないようにクッキー自体の有効期限を延ばす
@@ -298,7 +298,7 @@ function getPhysicOne($h_id, $u_id){
 function getPhysicData($u_id, $listSpan){
     try{
         $dbh = dbConnect();
-        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` ASC LIMIT :listSpan OFFSET 0';
+        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` DESC LIMIT :listSpan';
         $stmt = $dbh->prepare($sql);
         $stmt->bindValue(':u_id', $u_id, PDO::PARAM_INT);
         $stmt->bindValue(':listSpan', $listSpan, PDO::PARAM_INT);
@@ -306,7 +306,7 @@ function getPhysicData($u_id, $listSpan){
 
         if($stmt){
             $rst = $stmt->fetchAll();
-            return $rst;
+            return array_reverse($rst);
         }
 
     } catch ( Exception $e ){
@@ -320,7 +320,7 @@ function getPhysicDataList($u_id, $currentNum){
         $listSpan = 7 * $currentNum;
         $minSpan = 7 * ($currentNum - 1);
         $dbh = dbConnect();
-        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` ASC LIMIT :listSpan OFFSET :minSpan';
+        $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` DESC LIMIT :listSpan OFFSET :minSpan';
         $stmt = $dbh->prepare($sql);
         $stmt->bindValue(':u_id', $u_id, PDO::PARAM_INT);
         $stmt->bindValue(':listSpan', $listSpan, PDO::PARAM_INT);

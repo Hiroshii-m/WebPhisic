@@ -22,7 +22,7 @@ if(!empty($_POST)){
     // 画像以外のPOSTデータを変数へ格納
     $name = (!empty($_POST['name'])) ? $_POST['name'] : '';
     $email = (!empty($_POST['email'])) ? $_POST['email'] : '';
-    $height = (!empty($_POST['height'])) ? $_POST['height'] : '';
+    $height = (!empty($_POST['height'])) ? $_POST['height'] : 160;
 
     // バリデーションチェック
     // DB情報と変更のあった情報を調べる
