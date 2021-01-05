@@ -6,7 +6,6 @@ if(!empty($_SESSION['login_date'])){
     if($_SESSION['login_date'] + $_SESSION['login_limit'] <= time()){
         if(basename($_SERVER['PHP_SELF']) !== 'login.php'){
             header("Location:login.php");
-            exit;
         }
 
     }else if(time() <= $_SESSION['login_date'] + $_SESSION['login_limit']){

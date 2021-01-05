@@ -19,30 +19,26 @@ if(!empty($_POST)){
     validationPass($pass, 'pass');
 
     if(empty($err_msg)){
-        try{
-            debug('バリデーションOKです。');
-            // DB接続
-            $dbh = dbConnect();
-            $sql = 'SELECT id, email, password FROM users WHERE email = :email AND delete_flg = 0';
-            $data = array(':email' => $email);
-            $stmt = queryPost($dbh, $sql, $data);
-            $rst = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-            if(!empty($rst) && password_verify($pass, $rst['password'])){
-                debug('パスワードがマッチしました。');
-                
-                getLoginLimit();
-                // ユーザーidをセッションに格納
-                $_SESSION['user_id'] = $rst['id'];
-    
-                // マイページへ遷移
-                debug('マイページへ移動');
-                header("Location:mypage.php");
-            }else{
-                $err_msg['common'] = MSG_NOLOGIN;
-            }
-        } catch ( Exception $e ){
-            error_log('エラー発生：' . print_r($e->getMessage()));
+        debug('バリデーションOKです。');
+
+        // DB接続
+        $dbh = dbConnect();
+        $sql = 'SELECT id, email, password FROM users WHERE email = :email AND delete_flg = 0';
+        $data = array(':email' => $email);
+        $stmt = queryPost($dbh, $sql, $data);
+        $rst = $stmt->fetch(PDO::FETCH_ASSOC);
+        if(!empty($rst) && password_verify($pass, $rst['password'])){
+            debug('パスワードがマッチしました。');
+            
+            getLoginLimit();
+            // ユーザーidをセッションに格納
+            $_SESSION['user_id'] = $rst['id'];
+
+            // マイページへ遷移
+            debug('マイページへ移動');
+            header("Location:mypage.php");
+        }else{
+            $err_msg['common'] = MSG_NOLOGIN;
         }
 
     }
@@ -63,8 +59,8 @@ require('head.php');
         <form class="form_list" action="" method="post">
             <h2 class="form_tit">ログイン</h2>
             <div class="area-msg">
-                    <?= showErr('common'); ?>
-                </div>
+                <?= showErr('common'); ?>
+            </div>
             <label class="form_item <?php validErr('email'); ?>" for="">
                 Email
                 <input class="form_input" type="text" name="email" value="<?= showValue('email'); ?>">

@@ -87,6 +87,29 @@ img{
 }
 
 /* =================================== */
+/* ページネーション */
+/* =================================== */
+.page{
+    max-width: 300px;
+    margin: 50px auto;
+}
+.page_btn{
+    background: #539B46;
+    width: 30px;
+    height: 35px;
+    text-align: center;
+    cursor: pointer;
+}
+.page_num{
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
+/* =================================== */
 /* グラフ */
 /* =================================== */
 .graph_menu{

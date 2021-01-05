@@ -1,4 +1,7 @@
 <?php
+// 制作時間：43時間9分
+
+
 // =====================================
 // ログ
 // =====================================
@@ -8,7 +11,7 @@ ini_set('error_log', 'error.log');
 // =====================================
 // デバッグ
 // =====================================
-$debug_flg = false;
+$debug_flg = true;
 function debug($str){
     global $debug_flg;
     if(!empty($debug_flg)){
@@ -317,18 +320,27 @@ function getPhysicData($u_id, $listSpan){
 // 体調データリストを取得する
 function getPhysicDataList($u_id, $currentNum){
     try{
+        $dbh = dbConnect();
+        $sql = 'SELECT count(*) FROM health WHERE u_id = :u_id';
+        $data = array(':u_id' => $u_id);
+        $stmt = queryPost($dbh, $sql, $data);
+        $rst = $stmt->fetchAll();
+        // total items
+        $totalItems = $rst[0]['count(*)'];
+        // total pages
+        $rst['total_pages'] = ceil($totalItems/7);
+
         $listSpan = 7 * $currentNum;
         $minSpan = 7 * ($currentNum - 1);
-        $dbh = dbConnect();
         $sql = 'SELECT * FROM health WHERE u_id = :u_id ORDER BY `date` DESC LIMIT :listSpan OFFSET :minSpan';
         $stmt = $dbh->prepare($sql);
         $stmt->bindValue(':u_id', $u_id, PDO::PARAM_INT);
         $stmt->bindValue(':listSpan', $listSpan, PDO::PARAM_INT);
         $stmt->bindValue(':minSpan', $minSpan, PDO::PARAM_INT);
-        $rst = $stmt->execute();
+        $stmt->execute();
 
         if($stmt){
-            $rst = $stmt->fetchAll();
+            $rst['data'] = $stmt->fetchAll();
             return $rst;
         }
 
@@ -351,6 +363,54 @@ function getLoginLimit(){
 // サニタイズ
 function sanitize($str){
     return htmlspecialchars($str, ENT_QUOTES);
+}
+// ページング
+function pagenation($currentPageNum, $totalPages){
+    // 5ページ以上の場合
+    if($currentPageNum === $totalPages && 5 <= $totalPages){
+        $minPageNum = $currentPageNum - 4;
+        $maxPageNum = $totalPages;
+    // トータルページから1ページ前
+    }else if($currentPageNum === ($totalPages - 1) && 5 <= $totalPages){
+        $minPageNum = $currentPageNum - 3;
+        $maxPageNum = $currentPageNum + 1;
+    // 現在ページが2ページの場合
+    }else if($currentPageNum === 2 && 5 <= $totalPages){
+        $minPageNum = $currentPageNum - 1;
+        $maxPageNum = $currentPageNum + 3;
+    // 現在ページが1ページの場合
+    }else if($currentPageNum === 1 && 5 <= $totalPages){
+        $minPageNum = 1;
+        $maxPageNum = 5;
+    // トータルページが5ページ以上のその他の場合
+    }else if(5 <= $totalPages){
+        $minPageNum = $currentPageNum - 2;
+        $maxPageNum = $currentPageNum + 2;
+    // トータルページが5未満の場合
+    }else if($totalPages < 5){
+        $minPageNum = 1;
+        $maxPageNum = $totalPages;
+    }
+
+    echo '<div class="page c-flex">';
+    if($currentPageNum != 1){
+        echo '<div class="page_left page_btn">';
+            echo '<a class="page_num" href="mypage.php?p_id=1">&lt;</a>';
+        echo '</div>';
+    }
+    for($i = $minPageNum; $i <= $maxPageNum; $i++){
+        echo '<div class="page_btn">';
+            echo '<a href="mypage.php?p_id='.$i.'" class="page_num">'.$i.'</a>';
+        echo '</div>';
+    
+    }
+    if($currentPageNum != $totalPages){
+        echo '<div class="page_right page_btn">';
+            echo '<a class="page_num" href="mypage.php?p_id='.$totalPages.'">&gt;</a>';
+        echo '</div>';
+    }
+    echo '</div>';
+
 }
 // ファイルアップロード
 function uploadImg($file, $key){

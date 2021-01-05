@@ -13,6 +13,8 @@ require_once('jpgraph-4.3.4/src/jpgraph.php');
 require_once('jpgraph-4.3.4/src/jpgraph_line.php');
 require_once('jpgraph-4.3.4/src/jpgraph_date.php');
 
+$p_id = (!empty($_GET['p_id'])) ? $_GET['p_id'] : 1;
+
 // グラフの表示項目
 $g_option = (!empty($_POST['graph_item'])) ? $_POST['graph_item'] : 'weight';
 // 折れ線グラフの準備
@@ -47,8 +49,10 @@ $u_id = $_SESSION['user_id'];
 $UserInfo = getUserInfo($u_id);
 $listSpan = (!empty($_POST['graph_term'])) ? $_POST['graph_term'] : 7; // 期間を指定
 $dbPhysicData = getPhysicData($u_id, $listSpan);
-$currentNum = 1;
-$dbFormData = getPhysicDataList($u_id, $currentNum); // 一覧のデータを取得
+// 体調データリスト
+$currentPageNum = $p_id;
+$dbFormData = getPhysicDataList($u_id, $currentPageNum); // 一覧のデータを取得
+$totalPages = $dbFormData['total_pages']; // 一覧のトータルページ数
 
 foreach($dbPhysicData as $key => $val){
     if($g_option === 'sleeptime'){
@@ -149,8 +153,8 @@ require('head.php');
             <div class="ct_list">
                 <div class="ct_wrap">
                 <?php 
-                if(!empty($dbFormData[0])){
-                foreach($dbFormData as $key => $val): 
+                if(!empty($dbFormData['data'][0])){
+                foreach($dbFormData['data'] as $key => $val): 
                 ?>
                     <div class="ct_item">
                         <a href="editPhysic.php?h_id=<?= $val['id']; ?>" class="ct_change">編集する</a>
@@ -182,6 +186,11 @@ require('head.php');
                 ?>
                 </div>
             </div>
+            <!-- ページネーション -->
+            <?php
+                pagenation($currentPageNum, $totalPages);
+            ?>
+
         </div>
     </section><!-- /コンテンツ -->
 

@@ -30,21 +30,25 @@ if(!empty($_POST)){
 
     if(empty($err_msg)){
         debug('バリデーションOKです。');
-
-        // DB接続
-        $dbh = dbConnect();
-        $sql = 'INSERT INTO users (email, password) VALUES (:email, :password)';
-        $data = array(':email' => $email, ':password' => password_hash($pass, PASSWORD_DEFAULT));
-        $stmt = queryPost($dbh, $sql, $data);
-
-        if($stmt){
-            getLoginLimit();
-            // ユーザーidをセッションに格納
-            $_SESSION['user_id'] = $dbh->lastInsertId();
-
-            // マイページへ遷移
-            header("Location:mypage.php");
-            exit;
+        try{
+            // DB接続
+            $dbh = dbConnect();
+            $sql = 'INSERT INTO users (email, password) VALUES (:email, :password)';
+            $data = array(':email' => $email, ':password' => password_hash($pass, PASSWORD_DEFAULT));
+            $stmt = queryPost($dbh, $sql, $data);
+    
+            if($stmt){
+                getLoginLimit();
+                // ユーザーidをセッションに格納
+                $_SESSION['user_id'] = $dbh->lastInsertId();
+    
+                // マイページへ遷移
+                header("Location:mypage.php");
+                exit;
+            }
+        } catch ( Exception $e ){
+            error_log('エラー発生：' . print_r($e->getMessage()));
+            $err_msg['common'] = MSG_WAIT;
         }
     }
 
@@ -63,6 +67,9 @@ require('head.php');
     <section class="form">
         <form class="form_list" action="" method="post">
             <h2 class="form_tit">新規登録</h2>
+            <div class="area-msg">
+                <?= showErr('common'); ?>
+            </div>
             <label class="form_item <?php validErr('email'); ?>" for="">
                 Email
                 <input class="form_input" type="text" name="email" value="<?= showValue('email'); ?>">
