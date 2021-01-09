@@ -1,12 +1,11 @@
 // 1. ウィンドウの上からjs-footerまでの高さを取得
 // 2. windowの高さが1よりも小さければ、js-footerのスタイルをposition:fixedでしたに固定してあげる。
 
-// 失敗
 // window.addEventListener('DOMContentLoaded',
 //     function(){
 //         // footerのDOMを取得
-//         var $footer = document.getElementsByClassName("js-footer");
-//         var footHeight = document.getElementsByClassName("js-footer").offsetTop;
+//         var $footer = document.querySelector(".js-footer");
+//         var footHeight = document.querySelector(".js-footer").offsetTop;
 //         // windowの高さを取得
 //         var windowHeight = window.innerHeight;
 //         console.log(footHeight);
